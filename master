@@ -1,0 +1,28 @@
+**#::::::::::::::::::::::::::::::::: Remedia ::::::::::::::::::::::::::::::::::::*			
+	replace audio_audit_intro = subinstr(audio_audit_intro, "/", "\", .)
+	
+	if "`c(username)'" == "fahmi" {
+		
+		remedia audio_audit_intro if !mi(audio_audit_intro) & !mi(consent), id(caseid) enum(enumname) from("${raw}/media") ///
+				to("C:/Users/fahmi/Dropbox/arced project/WB_TVB_2022/02_Main Survey/02_Resources/03_Data/07_Media/audio_audit_intro") ///
+				by(fdate enumname)
+			
+		remedia audio_audit_stress if !mi(audio_audit_stress) & !mi(consent), id(caseid) enum(enumname) from("${raw}/media") ///
+				to("C:/Users/fahmi/Dropbox/arced project/WB_TVB_2022/02_Main Survey/02_Resources/03_Data/07_Media/audio_audit_stress") ///
+				by(fdate enumname)
+				
+		remedia audio_audit_school_attn if !mi(audio_audit_school_attn) & !mi(consent), id(caseid) enum(enumname) from("${raw}/media") ///
+				to("C:/Users/fahmi/Dropbox/arced project/WB_TVB_2022/02_Main Survey/02_Resources/03_Data/07_Media/audio_audit_school_attn") ///
+				by(fdate enumname)
+				
+				
+		preserve 
+			foreach var of varlist audio_audit_intro audio_audit_stress audio_audit_school_attn {
+				replace `var' = "1" if !mi(`var')
+				destring `var', replace
+			}
+			collapse (first) enumname (count) audio_audit_intro audio_audit_stress audio_audit_school_attn, by(enumid fdate)
+			sort fdate enumname
+			export excel using "C:/Users/fahmi/Dropbox/arced project/WB_TVB_2022/02_Main Survey/02_Resources/03_Data/07_Media/summary.xlsx", replace firstrow(var)
+		restore	
+	}	
